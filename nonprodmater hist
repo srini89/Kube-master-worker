@@ -1,0 +1,912 @@
+clear
+vi .bashrc 
+. .bashrc
+clear
+vi install-packages.sh
+chmod +x install-packages.sh 
+apt-get update
+clear
+./
+./install-packages.sh 
+vi get_helm.sh
+chmod +x get_helm.sh 
+./get_helm.sh 
+sudo swapoff -a
+sudo sysctl net.bridge.bridge-nf-call-iptables=1
+sudo kubeadm init
+kubectl get nodes
+sudo mkdir -p /root/.kube
+sudo mkdir -p $HOME/.kube
+sudo cp /etc/kubernetes/admin.conf /root/.kube/config
+sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+kubectl taint nodes --all node-role.kubernetes.io/master-
+kubeadm init --pod-network-cidr=10.244.0.0/16
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml
+kubectl get pods --all-namespaces
+kubeadm init --pod-network-cidr=10.244.0.0/16
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml
+kubectl get pods --all-namespaces
+kubeadm init --pod-network-cidr=10.244.0.0/16 --skip-preflight-checks
+kubectl get pods --all-namespaces
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml
+kubectl get pods --all-namespaces
+kubectl get nodes
+kubectl get pods --all-namespaces
+history
+kubectl -n kube-system create sa tiller
+kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+helm init --service-account tiller
+kubectl get pods -n kube-system
+helm install  stable/nginx-ingress --name nginx --set controller.hostNetwork=true --set controller.service.type=NodePort --set rbac.create=true
+kubectl get pods
+clear
+kubectl get pods
+clear
+vi dashboard.sh
+vi kubernetes-dashboard-ingress.yaml
+vi kubernetes-dashboard-clusterrolebinding.yaml
+vi kubernetes-dashboard.yaml
+vi openssl.cnf
+vi regenrate_certs.sh
+ls
+vi kubernetes-dashboard-ingress.yaml 
+vi regenrate_certs.sh 
+vi openssl.cnf 
+chmod +x dashboard.sh 
+./dashboard.sh 
+kubectl get pods -n kube-system
+ls
+cd dashboard-setup/
+cd certs/
+ls
+cd openssl/
+ls
+cd dashboard/
+ls
+cd
+kubectl get ing -n kube-system
+cd dashboard-setup/
+ls
+cd certs/
+ls
+cd openssl/
+ls
+cat ca_crt.pem 
+cd
+nslookup kube-master
+kubectl get secrets -n kube-system
+kubectl describe kubernetes-dashboard-token-rv4q5 -n kube-system
+kubectl describe secret kubernetes-dashboard-token-rv4q5 -n kube-system
+kubectl create namespace sandbox
+clear
+ls
+hostname -i
+vi kube-master-aws
+vi .bash_history 
+kubectl get svc -n kube-system
+kubectl describe svc kubernetes-dashboard-svc -n kube-ssytem
+kubectl describe svc kubernetes-dashboard-svc -n kube-system
+curl 10.244.1.4:8443
+clear
+kubectl get ing -n kube-system
+kubectl describe svc kubernetes-dashboard-svc -n kube-system
+telnet 10.244.1.4 8443
+clear
+vi .bashrc 
+. .bashrc
+clear
+kubectlns kube-system
+clear
+kubectl get pods
+kubectl describe pod kubernetes-dashboard-5569448c6d-74fxv
+vi .bashrc 
+kubectl config current-context
+cd .kube/
+vi config-vw
+kubectl config --kubeconfig=config-vw view
+kubectl get pods
+cd
+kubectl get nodes
+kubectl set config --kubeconfig=config-vw view
+kubectl set config --kubeconfig=config-vw 
+kubectl set  --kubeconfig=config-vw 
+kubectl --help
+kubectl config use-context config-vw
+vi .kube/config-vw 
+cd /home/
+ls
+cd
+cd $HOME
+cd .kube/
+ls
+cd
+$HOME
+whoami
+kubectl config view
+export KUBECONFIG=$KUBECONFIG:$HOME/.kube/config-vw
+kubectl get pods
+kubectl get pods --all-namespaces
+export KUBECONFIG=$KUBECONFIG:$HOME/.kube/config
+kubectl ge tpods
+kubectl get pods
+clear
+kubectl
+clear
+kubectl get cluster-info
+cd .kube/
+ls
+rm -rf config-vw 
+ls
+cd
+kubectl get pods
+vi .kube/config-sq
+export KUBECONFIG=$KUBECONFIG:$HOME/.kube/config-sq
+kubectl get pods 
+kubectl get pods --all-namespaces
+kubectl config view
+kubectl config config-sq
+kubectl config -h
+kubectl config set -h
+kubectl config set config-sq
+kubectl config set-cluster config-sq
+kubectl get pods 
+kubectl config view
+kubectl config set-cluster config
+cd .kube/
+sl
+ls
+ll
+rm -rf config-sq 
+ls
+kubectl get pods 
+cd
+git clone https://github.com/kubernetes/heapster.git
+ls
+cd heapster/
+kubectl create -f deploy/kube-config/influxdb/
+de deploy/
+cd deploy
+ls
+cd kube-config/
+ls
+cd rbac/
+ls
+kubectl create -f heapster-rbac.yaml
+clear
+cd
+kubectl get pods
+clear
+kubectl get ing
+kubectl describe ing kubernetes-dashboard-ingress
+kuebctl describe svc kubernetes-dashboard-svc
+kubectl describe svc kubernetes-dashboard-svc
+kubectl edit  svc kubernetes-dashboard-svc
+cd dashboard-setup/
+ls
+vi kubernetes-dashboard.yaml 
+clear
+kubectl get pods --all-namespaces
+vi busybox.yaml
+ls
+kubectl apply -f busybox.yaml 
+kubectl get pods
+kubectlns default
+kubectl get pods
+clear
+helm search incubator
+helm add repo incubator https://kubernetes-charts-incubator.storage.googleapis.com
+helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com
+helm search incubator
+helm search incubator/chartmusuem
+helm search incubator/chartmuseum
+ls
+helm fetch incubator/chartmuseum
+ls
+tar -xvf chartmuseum-1.1.1.tgz 
+ls
+cd chartmuseum/
+ls
+vi values.yaml 
+cd
+helm install incubator/chartmuseum --set env.open.DISABLE_API=false
+echo http://127.0.0.1:8080
+kubectl get pods
+kubectl -f delete busybox.yaml 
+ls
+kubectl delete -f busybox.yaml 
+kubectl get ing
+kubectl get svc
+kubectl describe svc belligerent-iguana-chartmuseum
+curl 10.244.1.27:8080
+ifconfig
+export POD_NAME=$(kubectl get pods --namespace default -l "app=chartmuseum" -l "release=belligerent-iguana" -o jsonpath="{.items[0].metadata.name}")
+echo http://127.0.0.1:8080/
+kubectl port-forward $POD_NAME 8080:8080
+curl localhost:8080
+ufw allow 8080/tcp
+curl localhost:8080
+helm ls 
+helm delete belligerent-iguana --purge
+clear
+;s
+ls
+cat get_helm.sh 
+clear
+kubectl create secret generic chartmuseum-secret --from-file=credentials.json="test-kubernetes.json"
+ls
+cp /home/ksrinii89/test-kubernetes-5cd15bf39360.json /root/
+ls
+kubectl create secret generic chartmuseum-secret --from-file=credentials.json="test-kubernetes-5cd15bf39360.json"
+vi custom.yaml
+kubectl get secrets 
+kubectl describe secret chartmuseum-secret
+helm install --name my-chartmuseum -f custom.yaml stable/chartmuseum
+export POD_NAME=$(kubectl get pods --namespace default -l "app=chartmuseum" -l "release=my-chartmuseum" -o jsonpath="{.items[0].metadata.name}")
+echo http://127.0.0.1:8080/
+kubectl port-forward $POD_NAME 8080:8080
+kubectl get pods
+kubectl describe pod my-chartmuseum-chartmuseum-775467745c-r8bdg
+kubectl logs my-chartmuseum-chartmuseum-775467745c-r8bdg
+cp /home/ksrinii89/test-kubernetes-a198c74d7dee.json /root/
+ls
+kubectl create secret generic chartmuseum-secret --from-file=credentials.json="test-kubernetes-a198c74d7dee.json"
+kubectl delete secret chartmuseum-secret
+kubectl create secret generic chartmuseum-secret --from-file=credentials.json="test-kubernetes-a198c74d7dee.json"
+kubectl get pods 
+kubectl delete pod my-chartmuseum-chartmuseum-775467745c-r8bdg
+kubectl get pods 
+clear
+kubectl get pods 
+kubectl logs my-chartmuseum-chartmuseum-775467745c-cvhsl 
+kubectl get svc
+kubectl get ing
+kubectl get svc
+kubectl describe svc my-chartmuseum-chartmuseum
+curl 10.244.1.29:8080
+export POD_NAME=$(kubectl get pods --namespace default -l "app=chartmuseum" -l "release=my-chartmuseum" -o jsonpath="{.items[0].metadata.name}")
+echo http://127.0.0.1:8080/
+kubectl port-forward $POD_NAME 8080:8080
+curl http://localhost:8080
+helm repo list 
+ifconfig
+helm repo add chartmuseum http://10.150.0.2:8080/api/charts
+kubectl get pods
+kubectl edit pod my-chartmuseum-chartmuseum-775467745c-cvhsl
+hostname
+nslookup $(hostname)
+curl -v http://kube-master.c.test-kubernetes-205717.internal:8080
+ufw status
+netstat -an | grep "LISTEN "
+nmap
+apt-get install nmap
+nmap
+nmap 10.150.0.2
+iptables -L -n
+python3 -m http.server
+nmap hostname
+nmap 10.150.0.25
+nmap -Pn
+netstat
+netstat | grep LISTEN
+sudo ufw allow 22
+sudo ufw allow 8080
+sudo ufw enable
+reboot
+curl -v http://kube-master.c.test-kubernetes-205717.internal:8080
+nmap 10.150.0.2
+ufw status
+ufw disable
+systemctl restart
+reboot
+curl -v http://kube-master.c.test-kubernetes-205717.internal:8080
+kubectl get pods
+helm repo update
+curl http://10.150.0.2:8080
+curl http://10.150.0.2:8080/api/charts
+curl http://10.150.0.3:8080/api/charts
+vi etc/hosts
+vi /etc/hosts
+curl http://10.150.0.2:8080/api/charts
+vi /etc/hosts
+curl http://10.150.0.2:8080/api/charts
+kubectl cluster-info
+kubectl proxy --port=8080 &
+kubectl porxy Kubernetes master is running at https://10.150.0.2:6443
+kubectl proxy https://10.150.0.2:6443
+kubectl proxy
+clear
+kubectl get pods
+kubectl get svc
+kubectl describe svc my-chartmuseum-chartmuseum
+curl 10.244.1.29:8080
+ls
+rm -rf chartmuseum
+rm -rf chartmuseum-1.1.1.tgz 
+clear
+helm fetch stable/chartmuseum
+tar -xvf chartmuseum-1.5.0.tgz 
+cd chartmuseum/
+ls
+cd templates/
+ls
+vi ingress.yaml 
+cd ..
+vi values.yaml 
+cd ..
+helm package chartmuseum --debug
+cd chartmuseum/
+helm install --dry-run .
+vi values.yaml 
+helm install --dry-run .
+vi values.yaml 
+helm install --dry-run .
+cd ..
+helm package chartmuseum --debug
+ll
+clear
+helm ls 
+helm delete --purge my-chartmuseum
+cd chartmuseum/
+ls
+vi values.yaml 
+cd ..
+ls
+helm install --name my-chartmuseum -f custom.yaml chartmuseum-1.5.0.tgz 
+kubectl get ing 
+kubectl edit ing 
+kubectl get svc
+kubectl describe svc my-chartmuseum-chartmuseum
+curl 10.244.1.30:8080
+kubectl edit ing 
+vi chartmuseum/values.yaml 
+kubectl edit ing 
+kubectl describe ing
+kubectl edit ing
+kubectl describe ing
+kubectl edit ing
+vi chartmuseum/values.yaml 
+kubectl edit ing
+vi chartmuseum/values.yaml 
+kubectl edit ing
+kubectl describe ing
+kubectl edit ing 
+kubectl describe svc 
+kubectl edit  svc 
+kubectl get svc
+kubectl edit svc
+kubectl edit svc my-chartmuseum-chartmuseum
+helm ls
+helm delete --purge my-chartmuseum
+helm install --name my-chartmuseum -f custom.yaml chartmuseum-1.5.0.tgz 
+cd chartmuseum/
+ls
+cd templates/
+ls
+vi pvc.yaml 
+vi NOTES.txt 
+vi _helpers.tpl 
+cd ..
+ls
+cd chartmuseum/
+;s
+ls
+cd ..
+ls 
+ls
+clear
+ln -s
+ln --help
+clear
+ls
+vi dashboard.sh 
+cat dashboard.sh 
+mkdir test 
+cd test
+openssl genrsa -out CA.key 2048
+ls
+vi CA.key 
+cd ..
+ls
+rm -rf dashboard-setup/
+ls
+./dashboard.sh 
+cd dashboard-setup/certs/
+cd openssl/
+ls
+cd dashboard/
+ls
+cd
+ls
+vi dashboard.sh 
+cd dashboard-setup/
+ls
+cd certs/
+ls
+cd openssl/
+l
+vi kubernetes-dashboard.vw.com-onlycert.pem 
+ls
+cd ..
+ls
+cd server/
+ls
+vi cert.pem 
+cd ..
+cd openssl/
+ls
+vi kubernetes-dashboard.vw.com.pem 
+cd
+vi dashboard.sh 
+cd dashboard-setup/
+cd certs/
+cd openssl/
+cp -rp kubernetes-*.*.com.pem dashboard/dashboard.crt
+cd dashboard/
+ls
+vi dashboard.crt 
+cat /root/dashboard.sh 
+kubectl delete secret kubernetes-dashboard-certs
+kubectl delete secret kubernetes-dashboard-certs -n kube-system
+kubectl create secret generic kubernetes-dashboard-certs --from-file=/root/dashboard-setup/certs/openssl/dashboard -n kube-system
+cd
+kubectlns
+kubectlns kube-system
+kubectl get pods
+kubectl delete pods kubernetes-dashboard-5569448c6d-74fxv
+kubectl get pods
+kubectl get secrets
+kubectl describe kubernetes-dashboard-token-rv4q5
+kubectl describe secret kubernetes-dashboard-token-rv4q5
+clear
+kubectl logs kubernetes-dashboard-5569448c6d-kk7mg
+kubectl logs kubernetes-dashboard-5569448c6d-kk7mg tail -f
+kubectl logs kubernetes-dashboard-5569448c6d-kk7mg tail f
+kubectl logs kubernetes-dashboard-5569448c6d-kk7mg tail --f
+kubectl logs kubernetes-dashboard-5569448c6d-kk7mg tail -f
+kubectl logs Incoming HTTP/1.1 GET /api/v1/login/status request from 10.244.1.0:33842: {}
+clear
+kubectl get pods
+kubectl logs kubernetes-dashboard-5569448c6d-kk7mg tail -f
+kubectl logs kubernetes-dashboard-5569448c6d-kk7mg -f
+clear
+kubectl get roles
+kubectl describe roles kubernetes-dashboard-minimal
+kubectl get rolebinding
+kubectl get clusterrolebinding
+kubectl describe clusterrolebinding kubernetes-dashboard
+cat /root/dashboard-setup/certs/openssl/dashboard/dashboard.key | base64 |tr -d "\n"
+cat /root/dashboard-setup/certs/openssl/dashboard/dashboard.crt | base64 |tr -d "\n"
+kubectl delete secrets kubernetes-dashboard-certs -n kube-system
+kubectl create secret generic kubernetes-dashboard-certs --from-file=/root/dashboard-setup/certs/openssl/dashboard -n kube-system
+kubectl fet secrets
+kubectl get secrets
+kubectl describe kubernetes-dashboard-certs
+kubectl describe secrets kubernetes-dashboard-certs
+kubectl get secrets kubernetes-dashboard-certs -n kube-system
+lsof -i :443
+lsof -i:80
+lsof -i:443
+kubectl get svc 
+kubectl describe svc 
+clear
+kubectl describe svc  kubernetes-dashboard-svc
+curl 10.244.0.10:8443
+curl 10.99.115.31
+curl 10.244.0.10
+kubectl describe ing
+lsof -i:80
+kill pid 1377 
+kill PID 1377 
+top | grep dash
+kill 1377
+ufw status
+clear
+kubectl get clusterrole
+kubectl describe cluster-admin
+kubectl describe clusterrole cluster-admin
+cd ..
+cd
+clear
+cd dashboard-setup/
+ls
+kubectl delete -f kubernetes-dashboard-clusterrolebinding.yaml 
+kubectl describe cluster-admin
+kubectl get clusterrole
+ls
+cd
+kubectl get secrets
+clear
+kubectl get secrets
+kubectl describe secret kubernetes-dashboard-token-rv4q5
+kubeadm
+cd dashboard-setup/
+vi kubernetes-dashboard.yaml 
+kubeadm --version
+kubeadm version
+kubeadm version -o
+kubeadm version -h
+kubeadm version --output string
+kubeadm version --output
+kubeadm version --outputstring
+kubeadm version --o yaml
+kubeadm version -o yaml
+kubeadm upgrade apply 1.9
+kubeadm upgrade apply 1.9.x
+kubeadm upgrade plan -h
+kubeadm upgrade apply -h
+kubeadm upgrade apply --dry-run
+kubeadm upgrade apply 1.9  --dry-run
+sudo kubeadm upgrade plan
+kubeadm upgrade apply v1.9.6
+kubeadm upgrade apply v1.10.4
+kubeadm upgrade apply v1.10.0
+kubeadm upgrade apply v1.10.4
+kubeadm upgrade apply v1.9.6
+sudo apt-get update
+sudo apt-get install kubeadm
+kubectl -n kube-system edit cm kubeadm-config
+kubectl get cm
+kubectl  edit cm kubeadm-config
+sudo kubeadm upgrade apply v1.9.6
+kubectl  edit cm kubeadm-config
+sudo kubeadm upgrade apply v1.9.6
+kubectl  edit cm kubeadm-config
+sudo kubeadm upgrade apply v1.9.6
+sudo apt-get install kublet
+sudo apt-get install kubelet
+sudo kubeadm upgrade apply v1.9.6
+kubectl get pods
+kubernetes version
+kubernetes --version
+juju upgrade-charm kubernetes-master
+apt-get install juju-2.0
+juju upgrade-charm kubernetes-master
+kubectl get pods
+sudo kubeadm upgrade apply v1.9.6
+kubectl -n kube-system get cm kubeadm-config -oyaml
+kubectl -n kube-system edit cm kubeadm-config 
+sudo kubeadm upgrade apply v1.9.6
+kubectl -n kube-system edit cm kubeadm-config 
+sudo kubeadm upgrade apply v1.9.6
+kubectl -n kube-system edit cm kubeadm-config 
+sudo kubeadm upgrade apply v1.9.6
+kubectl -n kube-system edit cm kubeadm-config 
+sudo kubeadm upgrade apply v1.9.6
+kubectl --version
+kubectl version
+apt-get install kubernetes
+clear
+kubectl -n kube-system edit cm kubeadm-config 
+apt-get install kubernetes
+sudo kubeadm upgrade apply v1.9.6
+kubectl -n kube-system edit cm kubeadm-config 
+sudo kubeadm upgrade apply v1.9.6
+kubectl -n kube-system get cm kubeadm-config -oyaml
+kubectl get secret $(kubectl get serviceaccount dashboard -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode
+kubectl create serviceaccount dashboard -n kube-system
+kubectl create clusterrolebinding dashboard-admin -n kube-system \
+kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole=cluster-admin --serviceaccount=kube-system:dashboard 
+kubectl get secret $(kubectl get serviceaccount dashboard -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode
+kubectl delete v  dashboard-admin
+kubectl delete clusterrolebinding   dashboard-admin
+ls
+kubectl delete sa v
+kubectl delete sa dashboard
+kubectl get pods
+kubectl describe po/kubernetes-dashboard-5569448c6d-kk7mg
+kubectl get ing
+kubectl logs v
+kubectl logs kubernetes-dashboard.vw.com
+kubectl logs kubernetes-dashboard-5569448c6d-kk7mg
+kubectl get svc
+kubectl describe svc kubernetes-dashboard-svc
+curl 10.244.0.10:8443
+kubectl clusterinfo
+kubectl cluster-info
+cd ..
+ls
+./dashboard.sh 
+clear
+ls
+kubectl get pods
+kubectl describe ing
+kubectl get ing
+kubectl get pods
+kubectl logs kubernetes-dashboard-5569448c6d-kk7mg
+kubectl logs kubernetes-dashboard-5569448c6d-kk7mg -f
+kubectl get pods
+kubectl describe svc 
+clear
+kubectl get svc 
+kubectl describe svc kubernetes-dashboard-svc
+kubectl get pods -n default
+kubectl logs nginx-nginx-ingress-controller-77f68fd55f-mdrgm -n default
+kubectl logs nginx-nginx-ingress-controller-77f68fd55f-mdrgm -n default | grep 504
+kubectl describe svc kubernetes-dashboard-svc
+curl $HOSTNAME:8443
+curl $HOSTNAME: 8443
+vi install-packages.sh 
+apt install kubelet=1.8
+apt install kubelet 1.8
+apt-get install kubelet=1.8
+vi install-packages.sh 
+apt-get install kubelet=1.8.4-00
+vi install-packages.sh 
+apt-get install kubeadm=1.8.4-00
+kubectl get pods
+vi install-packages.sh 
+apt-get install kubernetes-cni=0.5.1-00
+vi install-packages.sh 
+apt-get install kubectl=1.8.4-00
+clear
+ls
+clear
+kubectl cluster-info
+hostnam
+hostname
+nslookup kube-master
+giot clone https://github.com/GoogleCloudPlatform/heapster/
+git clone https://github.com/GoogleCloudPlatform/heapster/
+git clone https://github.com/kubernetes/heapster
+ls
+cd heapster/
+ls
+cat /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+cd cd /etc/kubernetes/pki/etcd
+cd
+cd cd /etc/kubernetes/pki/etcd
+cd /etc/kubernetes/pki/etcd
+cd /etc/kubernetes/pki
+ls
+ll
+cd
+curl -o /usr/local/bin/cfssl https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+ls
+ll
+cd
+clear
+ls
+clear
+curl -o /usr/local/bin/cfssljson https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+l
+ll
+clear
+cd /etc/kubernetes/manifests/etcd.yaml
+cd /etc/kubernetes/manifests/
+ls
+cd
+chmod +x /usr/local/bin/cfssl*
+mkdir -p /etc/kubernetes/pki/etcd
+cd /etc/kubernetes/pki/etcd
+ls
+clear
+cat >ca-config.json
+ls
+vi ca-config.json 
+clear
+ls
+rm -rf ca-config.json 
+cat >ca-config.json <<EOF
+{
+    "signing": {
+        "default": {
+            "expiry": "43800h"
+        },
+        "profiles": {
+            "server": {
+                "expiry": "43800h",
+                "usages": [
+                    "signing",
+                    "key encipherment",
+                    "server auth",
+                    "client auth"
+                ]
+            },
+            "client": {
+                "expiry": "43800h",
+                "usages": [
+                    "signing",
+                    "key encipherment",
+                    "client auth"
+                ]
+            },
+            "peer": {
+                "expiry": "43800h",
+                "usages": [
+                    "signing",
+                    "key encipherment",
+                    "server auth",
+                    "client auth"
+                ]
+            }
+        }
+    }
+ }
+ EOF
+
+ls
+cat >ca-config.json <<EOF
+ {
+    "signing": {
+        "default": {
+            "expiry": "43800h"
+        },
+        "profiles": {
+            "server": {
+                "expiry": "43800h",
+                "usages": [
+                    "signing",
+                    "key encipherment",
+                    "server auth",
+                    "client auth"
+                ]
+            },
+            "client": {
+                "expiry": "43800h",
+                "usages": [
+                    "signing",
+                    "key encipherment",
+                    "client auth"
+                ]
+            },
+            "peer": {
+                "expiry": "43800h",
+                "usages": [
+                    "signing",
+                    "key encipherment",
+                    "server auth",
+                    "client auth"
+                ]
+            }
+        }
+    }
+ }
+ EOF
+
+ls
+clear
+cat >ca-config.json <<EOF | {
+    "signing": {
+        "default": {
+            "expiry": "43800h"
+        },
+        "profiles": {
+            "server": {
+                "expiry": "43800h",
+                "usages": [
+                    "signing",
+                    "key encipherment",
+                    "server auth",
+                    "client auth"
+                ]
+            },
+            "client": {
+                "expiry": "43800h",
+                "usages": [
+                    "signing",
+                    "key encipherment",
+                    "client auth"
+                ]
+            },
+            "peer": {
+                "expiry": "43800h",
+                "usages": [
+                    "signing",
+                    "key encipherment",
+                    "server auth",
+                    "client auth"
+                ]
+            }
+        }
+    }
+ }
+EOF
+
+ls
+vi ca-config.json
+ls
+rm -rf 1
+ls
+vi ca-csr.json
+cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
+vi client.json
+cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=client client.json | cfssljson -bare client
+ls
+export PEER_NAME=$(hostname)
+export PRIVATE_IP=$(ip addr show eth1 | grep -Po 'inet \K[\d.]+')
+export PRIVATE_IP=$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')
+ifconfig
+echo $PRIVATE_IP
+echo $(PRIVATE_IP)
+echo $PRIVATE_IP
+echo "$PRIVATE_IP"
+clear
+export PRIVATE_IP=$(ip addr show  | grep -Po 'inet \K[\d.]+')
+ssh-keygen -t rsa -b 4096 -C "ksrinii89@gmail.com"
+ls
+cd ../../
+ls
+cd manifests/
+ls
+vi etcd.yaml 
+ls
+cat install-packages.sh 
+vi install-packages.sh 
+clear
+vi .bash_history 
+kubectl get pods 
+kubectl edit pods kube-flannel-ds-crrrw
+clear
+vi .bash_history
+rm -rf .bash_history.swp 
+vi .bash_history 
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml
+kubectl get pods
+kubectl edit pod kube-flannel-ds-crrrw
+clear
+kubectl create namespace qos-example
+qos-pod.yaml docs/tasks/configure-pod-container  
+apiVersion: v1
+kind: Pod
+metadata:
+spec:
+clear
+kubectl create -f https://k8s.io/docs/tasks/configure-pod-container/qos-pod.yaml --namespace=qos-example
+kubectl get pod qos-demo --namespace=qos-example --output=yaml
+clear
+kubectlns qos-example
+kubectl get pods
+kubectl get pods -o yaml
+kubectl delete pod qos-demo --namespace=qos-example
+v
+kubectl create -f https://k8s.io/docs/tasks/configure-pod-container/qos-pod-2.yaml --namespace=qos-example
+kubectl get pods
+clear
+kubectl get pod qos-demo-2 --namespace=qos-example --output=yaml
+kubectl edit pod qos-demo-2 --namespace=qos-example --output=yaml
+kubectl edit deploy qos-demo-2 --namespace=qos-example --output=yaml
+kubectl get deploy
+clear
+ls
+vi pod.yaml
+kubectl create -f pod.yaml
+vi pod.yaml 
+kubectl create -f pod.yaml
+kubectl get pod qos-demo-3 -o yaml
+vi pod2.yaml
+kubectl create -f pod2.yaml 
+kubectl get pod qos-demo -o yaml
+kubectl delete pod qos -demo
+kubectl delete pod qos-demo
+clear
+vi pod2.yaml 
+kubectl create -f pod2.yaml 
+kubectl get pod qos-demo -o yaml
+kubectl delete pod qos-demo 
+clear
+vi pod.yaml 
+kubectl get pods
+kubectl delete pod qos-demo-3
+clear
+kubectl create -f pod.yaml 
+kubectl get pod qos-demo-3 -o yaml
+clear
+kubectl get pods
+kubectl delete pod qos-demo-2 qos-demo-3
+clear
+kubectl create -f https://k8s.io/docs/tasks/configure-pod-container/qos-pod-3.yaml --namespace=qos-example
+kubectl get pod qos-demo-3 --namespace=qos-example --output=yaml
+osClass: BestEffort
+kubectl delete pod qos-demo-3 --namespace=qos-example
+kubectl create -f https://k8s.io/docs/tasks/configure-pod-container/qos-pod-4.yaml --namespace=qos-example
+kubectl get pods
+kubectl get pod qos-demo-4 --namespace=qos-example --output=yaml
+kubectl delete pod qos-demo-4 --namespace=qos-example
+kubectl delete namespace qos-example
+kubectl get pods
+clear
+make dev
+ls
+cd ..
+exit
