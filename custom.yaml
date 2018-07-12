@@ -1,0 +1,11 @@
+env:
+  open:
+    STORAGE: google
+    STORAGE_GOOGLE_BUCKET: my-gcs-bucket-1
+    STORAGE_GOOGLE_PREFIX:
+
+gcp:
+  secret:
+    enabled: true
+    name: chartmuseum-secret
+    key: credentials.json

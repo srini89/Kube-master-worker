@@ -1,0 +1,189 @@
+#!/bin/bash
+
+set -x
+
+# Deploy Kubernetes Setup.
+name=$(hostname -f)
+
+###########################################################################################
+
+#Install Basic Packages
+apt-get update -y
+apt-get install -y lsof curl
+
+###########################################################################################
+
+#AWS CLI Setup
+
+apt-get install -y ruby curl python
+
+curl -O https://bootstrap.pypa.io/get-pip.py
+
+python get-pip.py
+
+pip install awscli
+
+loguser="ubuntu"
+
+cd /home/$loguser
+
+mkdir -p /home/$loguser/.aws
+
+echo "[default]
+aws_access_key_id = AKIAIEDPWJWUI62UULVA
+aws_secret_access_key = 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" > /home/$loguser/.aws/credentials
+
+echo "[default]
+output = text
+region = us-east-1
+aws_access_key_id = AKIAIEDPWJWUI62UULVA
+aws_secret_access_key = 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" > /home/$loguser/.aws/config
+
+chown -R $loguser:$loguser /home/$loguser
+
+ln -sf /home/$loguser/.aws ~/.aws
+
+echo "kube-master-0" > /etc/hostname
+
+ipaddr=$(ifconfig eth0 | grep -w inet | grep addr | awk -F ":" '{print $2}' | awk '{print $1}')
+
+echo -e "$ipaddr\tkube-master-0.elan.elantecs.com\tkube-master-0" >> /etc/hosts
+
+sysctl -w kernel.hostname=kube-master-0
+
+#############################################################################################
+
+#Create elanadmin
+groupadd -g 510 elanadmin
+useradd -u 1234 -g elanadmin -c "ELANADMIN SHARED ACCOUNT" -s /bin/bash -d /home/elanadmin elanadmin
+mkdir -m 700 -p /home/elanadmin/.ssh
+echo "el@nadmin12"|passwd elanadmin --stdin
+echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCb85pFC0los2baumrR0oGSfV62cnJIGefubFu+e6t1YGPHnzlORaeH5EHgavVEjaK9+4SzgEHXdxROTcZ6YjMln7hZDvjNFpXM0MYhhng2oWKOQcXcniNDcOKxKZVF825s6peykXBS6yk1Jtee2VKG9wjhZ7Ng2Cq4VR7F5p4EEK2eY1HhCdQy5f0q33XN5U8Vls2BQE888wogNKxVHkdn89odP6Ww0tWHCUGsi/roIl78nZ1/F0qr70tiTJMcAIv+i1nwQNOjgCeXtN2Lzq5QctiFNnZ4MAv8IvLYZiEx4W79MwxHSTwT35WYsIt4dNdFA9hkTvQMxdHLPWB0n4yB ELANADMIN-LOGIN' >> /home/elanadmin/.ssh/authorized_keys
+chmod 400 /home/elanadmin/.ssh/authorized_keys
+chown -R elanadmin:elanadmin /home/elanadmin
+grep elanadmin /etc/sudoers || echo -e "\nelanadmin     ALL=(ALL)NOPASSWD: ALL" >> /etc/sudoers
+wget https://s3.amazonaws.com/elanrepo/files/public/motd -O /etc/motd
+cp -rp /etc/motd /etc/issue
+
+#Convert dhcp to static ip on primary interface
+network_file="/etc/network/interfaces.d/50-cloud-init.cfg"
+ip_eth0=$(hostname -i)
+nameserver=$(grep nameserver /etc/resolv.conf  | awk '{print $2}')
+gw_eth0=$(route -n | grep UG | grep eth0 | awk '{print $2}')
+netmask=255.255.255.0
+
+update-rc.d ufw disable
+service ufw stop
+iptables -P FORWARD ACCEPT
+
+if [[ $ip_eth0 =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]] && [[ $gw_eth0 =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]] && [[ $nameserver =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+sed -i "/eth0/ s/dhcp/static/g" $network_file
+sed -i "/static/a address $ip_eth0" $network_file
+sed -i "/address/a netmask $netmask" $network_file
+sed -i "/netmask/a up route add default gw $gw_eth0" $network_file
+sed -i "/default/a dns-nameservers $nameserver" $network_file
+sed -i "/dns-nameservers/a dns-search ec2.internal" $network_file
+ifdown --all;ifup --all
+fi
+
+#############################################################################################
+#Setup and Install Kubernetes repos and packages
+
+apt-get install -y docker.io
+
+cat << EOF > /etc/docker/daemon.json
+{
+  "exec-opts": ["native.cgroupdriver=systemd"]
+}
+EOF
+
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+
+cat << EOF > /etc/apt/sources.list.d/kubernetes.list
+deb http://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+
+apt-get update
+apt-get install -y kubectl kubelet kubeadm
+
+swapoff -a
+sed -i "/swap/ s/^/#/g" /etc/fstab
+
+#Initialize Kube Master
+HOME=/root
+kubeadm init --pod-network-cidr=10.244.0.0/16 | tee /root/kubeadm.init
+echo $HOME
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+#Weavenet Network Pod
+cd $HOME
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml | tee /root/flannel.init
+kubectl get nodes
+
+##############################################################################################
+
+# Install nfs-kernel-server for Kubernetes Storage
+apt-get install -y nfs-kernel-server
+
+private_nfs_client=$(aws ec2 describe-instances --filters "Name=tag:Type,Values=Kubernetes-Worker" --query Reservations[].Instances[].NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress[])
+public_nfs_client=$(aws ec2 describe-instances --filters "Name=tag:Type,Values=Kubernetes-Worker" --query Reservations[].Instances[].NetworkInterfaces[].Association[].PublicIp[])
+
+for j in $private_nfs_client $public_nfs_client
+do
+for i in $j
+do
+echo -e "$i(rw,sync,no_subtree_check)" >> /tmp/file.$
+done
+done
+
+if [ -s "/tmp/file.$" ];then
+nfs_clients=$(cat /tmp/file.$ | tr "\n" " ")
+echo -e "/mnt\t$nfs_clients" >> /etc/exports
+fi
+
+exportfs -ra
+rm -rf /tmp/file.$
+##############################################################################################
+#Add /etc/hosts
+kube_workers=$(aws ec2 describe-instances --filters "Name=tag:Type,Values=Kubernetes-Worker" --query Reservations[].Instances[].NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress[])
+kube_masters=$(aws ec2 describe-instances --filters "Name=tag:Type,Values=Kubernetes-Master" --query Reservations[].Instances[].NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress[])
+
+count=0
+for i in $kube_workers
+do
+kube_worker=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=tf-init-kube-worker-$count" --query Reservations[].Instances[].NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress[])
+echo -e "$kube_worker\tkube-worker-$count.elan.elantecs.com\tkube-worker-$count" >> /etc/hosts
+count=$((count+1))
+done
+
+count=0
+for i in $kube_masters
+do
+kube_master=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=tf-init-kube-master-$count" --query Reservations[].Instances[].NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress[])
+echo -e "$kube_master\tkube-master-$count.elan.elantecs.com\tkube-master-$count" >> /etc/hosts
+count=$((count+1))
+done
+###############################################################################################
+# Helm Setup Related Roles Settings
+cd ~
+git clone https://github.com/daemonza/helmet.git
+wget https://kubernetes-helm.storage.googleapis.com/helm-v2.8.2-linux-amd64.tar.gz
+tar -zxvf helm-v2.8.2-linux-amd64.tar.gz
+cp -rp linux-amd64/helm /usr/sbin/
+kubectl taint node kube-master-0 node-role.kubernetes.io/master:NoSchedule- | tee ~/helmet.init
+/usr/sbin/helm init | tee -a ~/helmet.init
+kubectl create serviceaccount --namespace kube-system tiller
+kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+sleep 30
+helm package ~/helmet/helmet-chart/ -d ~/helmet/helmet-chart/ --debug | tee -a ~/helmet.init
+sleep 30
+helm install ~/helmet/helmet-chart/helmet-chart-0.0.1.tgz | tee -a ~/helmet.init
+eval $(egrep "NODE_IP=|NODE_PORT=" ~/helmet.init)
+sleep 60
+helm repo add helmet http://kube-master-0:$NODE_PORT/charts/
+curl -v -T ~/helmet/helmet-chart/helmet-chart-0.0.1.tgz -X PUT http://kube-master-0:$NODE_PORT/upload/ | tee -a ~/helmet.init
+curl http://kube-master-0:$NODE_PORT/charts/index.yaml | tee -a ~/helmet.init
+
