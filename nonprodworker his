@@ -1,0 +1,15 @@
+. .bashrc
+clear
+vi .bashrc 
+. .bashrc
+clear
+vi install-packages.sh
+chmod +x install-packages.sh 
+./
+./install-packages.sh 
+kubeadm join --token 7b91ba.13a5c977b736eb04 10.150.0.2:6443 --discovery-token-ca-cert-hash sha256:114c58828ae39274924af1ec43a184e59e8f152087861d1632f9d64ee2392efa
+history
+clear
+lsof -i:80
+lsof -i:443
+vi .bash_history
